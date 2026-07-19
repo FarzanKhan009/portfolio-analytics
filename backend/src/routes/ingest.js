@@ -46,7 +46,7 @@ router.post('/', ingestLimit, async (req, res) => {
   const eventRecord = {
     event_id: eventId,
     event_type,
-    timestamp: timestamp.toISOString().slice(0, 23).replace('T', ' '),
+    timestamp: timestamp.toISOString().slice(0, 19).replace('T', ' '), // ClickHouse standard DateTime format YYYY-MM-DD HH:MM:SS
     user_id: user_id || `usr_anon_${Math.floor(Math.random() * 100000)}`,
     session_id: session_id || `ses_anon_${Math.floor(Math.random() * 100000)}`,
     page,
