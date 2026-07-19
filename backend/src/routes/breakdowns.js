@@ -73,11 +73,25 @@ router.get('/', async (req, res) => {
     `;
     const referrersResult = await query(referrersSql, { from, to });
 
+    // 5. Browsers Breakdown
+    const browsersSql = `
+      SELECT
+        browser,
+        count() as count
+      FROM analytics_db.events
+      WHERE toYYYYMMDD(timestamp) >= toYYYYMMDD(toDate({from: String}))
+        AND toYYYYMMDD(timestamp) <= toYYYYMMDD(toDate({to: String}))
+      GROUP BY browser
+      ORDER BY count DESC
+    `;
+    const browsersResult = await query(browsersSql, { from, to });
+
     const breakdowns = {
       pages: pagesResult.map((r) => ({ page: r.page, views: parseInt(r.views), visitors: parseInt(r.visitors) })),
       devices: devicesResult.map((r) => ({ name: r.device, value: parseInt(r.count) })),
       countries: countriesResult.map((r) => ({ name: r.country, value: parseInt(r.count) })),
       referrers: referrersResult.map((r) => ({ name: r.referrer, value: parseInt(r.count) })),
+      browsers: browsersResult.map((r) => ({ name: r.browser, value: parseInt(r.count) })),
     };
 
     await setCache(cacheKey, breakdowns, 60);

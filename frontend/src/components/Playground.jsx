@@ -3,12 +3,20 @@ import confetti from 'canvas-confetti';
 import styles from './Playground.module.css';
 
 const PAGES = ['/home', '/pricing', '/docs', '/blog/scaling-clickhouse', '/features', '/contact', '/checkout'];
+const REFERRERS = [
+  { label: 'Google (Organic)', value: 'https://google.com' },
+  { label: 'GitHub (Developer)', value: 'https://github.com' },
+  { label: 'Twitter / X', value: 'https://twitter.com' },
+  { label: 'LinkedIn (Network)', value: 'https://linkedin.com' },
+  { label: 'Direct Traffic', value: 'Direct' },
+];
 
 export default function Playground({ apiUrl, onEventSent }) {
   const [eventType, setEventType] = useState('pageview');
   const [country, setCountry] = useState('US');
   const [device, setDevice] = useState('desktop');
   const [page, setPage] = useState('/home');
+  const [referrer, setReferrer] = useState('https://google.com');
   const [revenue, setRevenue] = useState('29.99');
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(null);
@@ -26,7 +34,7 @@ export default function Playground({ apiUrl, onEventSent }) {
     page: page,
     user_id: `usr_mock_${Math.floor(Math.random() * 900) + 100}`,
     session_id: `ses_mock_${Math.floor(Math.random() * 9000) + 1000}`,
-    referrer: 'Playground Simulator',
+    referrer: referrer,
     revenue: eventType === 'purchase' ? parseFloat(revenue) : 0,
   };
 
@@ -139,20 +147,35 @@ export default function Playground({ apiUrl, onEventSent }) {
             </div>
           </div>
 
-          {eventType === 'purchase' && (
+          <div className={styles.row}>
             <div className={styles.group}>
-              <label className={styles.label}>Revenue ($)</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0.99"
-                max="999.99"
-                value={revenue}
-                onChange={(e) => setRevenue(e.target.value)}
-                className={styles.input}
-              />
+              <label className={styles.label}>Referrer (Source)</label>
+              <select 
+                value={referrer} 
+                onChange={(e) => setReferrer(e.target.value)}
+                className={styles.select}
+              >
+                {REFERRERS.map(ref => (
+                  <option key={ref.value} value={ref.value}>{ref.label}</option>
+                ))}
+              </select>
             </div>
-          )}
+            
+            {eventType === 'purchase' && (
+              <div className={styles.group}>
+                <label className={styles.label}>Revenue ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.99"
+                  max="999.99"
+                  value={revenue}
+                  onChange={(e) => setRevenue(e.target.value)}
+                  className={styles.input}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Live Payload Preview */}

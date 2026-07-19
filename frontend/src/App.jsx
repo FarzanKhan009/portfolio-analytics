@@ -243,25 +243,48 @@ export default function App() {
             <div className="widget">
               <h3 className="widget-title">Devices & Browsers</h3>
               
-              <div className="device-browser-section">
-                <h4 className="panel-title" style={{ marginBottom: '10px' }}>Devices Distribution</h4>
-                {breakdowns?.devices.map((d) => (
-                  <div key={d.name} className="bar-row">
-                    <div className="bar-labels">
-                      <span>{d.name}</span>
-                      <span>{d.value.toLocaleString()}</span>
+              <div className="device-browser-section" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div>
+                  <h4 className="panel-title" style={{ marginBottom: '10px' }}>Devices</h4>
+                  {breakdowns?.devices.map((d) => (
+                    <div key={d.name} className="bar-row" style={{ marginBottom: '8px' }}>
+                      <div className="bar-labels">
+                        <span>{d.name}</span>
+                        <span>{d.value.toLocaleString()}</span>
+                      </div>
+                      <div className="bar-track">
+                        <div 
+                          className="bar-fill" 
+                          style={{ 
+                            width: `${(d.value / Math.max(1, breakdowns.devices.reduce((acc, curr) => acc + curr.value, 0))) * 100}%`,
+                            backgroundColor: d.name === 'desktop' ? 'var(--accent)' : 'var(--accent-2)'
+                          }}
+                        />
+                      </div>
                     </div>
-                    <div className="bar-track">
-                      <div 
-                        className="bar-fill" 
-                        style={{ 
-                          width: `${(d.value / breakdowns.devices.reduce((acc, curr) => acc + curr.value, 0)) * 100}%`,
-                          backgroundColor: d.name === 'desktop' ? 'var(--accent)' : 'var(--accent-2)'
-                        }}
-                      />
+                  ))}
+                </div>
+
+                <div>
+                  <h4 className="panel-title" style={{ marginBottom: '10px' }}>Browsers</h4>
+                  {breakdowns?.browsers?.map((b) => (
+                    <div key={b.name} className="bar-row" style={{ marginBottom: '8px' }}>
+                      <div className="bar-labels">
+                        <span>{b.name}</span>
+                        <span>{b.value.toLocaleString()}</span>
+                      </div>
+                      <div className="bar-track">
+                        <div 
+                          className="bar-fill" 
+                          style={{ 
+                            width: `${(b.value / Math.max(1, breakdowns.browsers.reduce((acc, curr) => acc + curr.value, 0))) * 100}%`,
+                            backgroundColor: b.name === 'Chrome' ? 'var(--accent)' : b.name === 'Safari' ? 'var(--accent-2)' : '#3b82f6'
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
             
