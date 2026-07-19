@@ -4,6 +4,7 @@ import Charts from './components/Charts';
 import PagesTable from './components/PagesTable';
 import RealtimeWidget from './components/RealtimeWidget';
 import Playground from './components/Playground';
+import DateRangePicker from './components/DateRangePicker';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -150,39 +151,18 @@ export default function App() {
 
           {/* Calendar Picker Dropdown */}
           {showDatePicker && (
-            <form onSubmit={handleCustomSubmit} className="date-picker-dropdown">
-              <div className="date-picker-row">
-                <div className="date-picker-group">
-                  <label>Start Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={customFrom}
-                    onChange={(e) => setCustomFrom(e.target.value)}
-                    max={customTo}
-                  />
-                </div>
-                <div className="date-picker-group">
-                  <label>End Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={customTo}
-                    onChange={(e) => setCustomTo(e.target.value)}
-                    min={customFrom}
-                    max={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
-              </div>
-              <div className="date-picker-actions">
-                <button type="button" className="time-btn" onClick={() => setShowDatePicker(false)}>
-                  Cancel
-                </button>
-                <button type="submit" className="time-btn active">
-                  Apply
-                </button>
-              </div>
-            </form>
+            <DateRangePicker
+              from={customFrom}
+              to={customTo}
+              onChange={(start, end) => {
+                setCustomFrom(start);
+                setCustomTo(end);
+                setTimeRange('custom');
+                // Fetch data immediately when dates change
+                setTimeout(() => fetchDashboardData(), 0);
+              }}
+              onClose={() => setShowDatePicker(false)}
+            />
           )}
         </div>
       </header>
@@ -253,7 +233,10 @@ export default function App() {
             
             <Playground 
               apiUrl={API_URL} 
-              onEventSent={fetchRealtimeData} 
+              onEventSent={() => {
+                fetchRealtimeData();
+                fetchDashboardData();
+              }} 
             />
 
             {/* Devices & Browsers list */}
