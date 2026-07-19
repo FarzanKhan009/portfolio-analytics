@@ -3,6 +3,7 @@ import KPICards from './components/KPICards';
 import Charts from './components/Charts';
 import PagesTable from './components/PagesTable';
 import RealtimeWidget from './components/RealtimeWidget';
+import Playground from './components/Playground';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
@@ -142,6 +143,11 @@ export default function App() {
             <RealtimeWidget 
               activeUsers={realtime.activeUsers} 
               recentEvents={realtime.recentEvents} 
+            />
+            
+            <Playground 
+              apiUrl={API_URL} 
+              onEventSent={fetchRealtimeData} 
             />
             
             {/* Quick performance showcase card */}
