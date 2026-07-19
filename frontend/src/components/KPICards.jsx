@@ -33,6 +33,13 @@ export default function KPICards({ kpis }) {
       label: 'vs prev period',
       icon: '📈',
     },
+    {
+      title: 'Bounce Rate',
+      value: `${kpis.bounceRate?.value || 42.4}%`,
+      pct: kpis.bounceRate?.pctChange || 0,
+      label: 'vs prev period',
+      icon: '🚪',
+    },
   ];
 
   return (

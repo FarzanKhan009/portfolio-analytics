@@ -67,6 +67,19 @@ router.post('/', ingestLimit, async (req, res) => {
     const redisKey = `active_users:${eventRecord.user_id}`;
     await redis.set(redisKey, 'active', { EX: 300 });
 
+    // Invalidate cached dashboard stats so the user sees changes immediately!
+    try {
+      const keys = await redis.keys('stats:*');
+      const keys2 = await redis.keys('timeseries:*');
+      const keys3 = await redis.keys('breakdowns:*');
+      const allKeys = [...keys, ...keys2, ...keys3];
+      if (allKeys.length > 0) {
+        await redis.del(allKeys);
+      }
+    } catch (cacheErr) {
+      console.error('Redis Invalidation Error:', cacheErr);
+    }
+
     res.status(202).json({
       status: 'accepted',
       event_id: eventId,
