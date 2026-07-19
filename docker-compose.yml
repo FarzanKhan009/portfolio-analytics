@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  # ClickHouse Columnar Analytics Database
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.3-alpine
+    container_name: analytics_clickhouse
+    restart: unless-stopped
+    ports:
+      - "8123:8123" # HTTP API
+      - "9000:9000" # Native TCP client
+    environment:
+      CLICKHOUSE_USER: analytics
+      CLICKHOUSE_PASSWORD: analytics_secure_password
+      CLICKHOUSE_DB: analytics_db
+    volumes:
+      - ch_data:/var/lib/clickhouse
+    networks:
+      - analytics_net
+    healthcheck:
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Redis Caching & Rate Limiting Layer
+  redis:
+    image: redis:7-alpine
+    container_name: analytics_redis
+    restart: unless-stopped
+    ports:
+      - "6399:6379"
+    command: redis-server --requirepass redis_secure_password
+    volumes:
+      - redis_data:/data
+    networks:
+      - analytics_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_secure_password", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  ch_data:
+  redis_data:
+
+networks:
+  analytics_net:
+    driver: bridge

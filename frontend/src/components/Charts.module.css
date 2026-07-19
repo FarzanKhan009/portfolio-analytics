@@ -1,0 +1,52 @@
+.tabs {
+  display: flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 2px;
+  border-radius: 8px;
+}
+
+.tabBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  transition: all var(--t-base);
+}
+
+.tabBtn:hover {
+  color: var(--text-primary);
+}
+
+.tabBtn.active {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.chartContainer {
+  margin-top: 16px;
+}
+
+/* Custom Tooltip Styles */
+.tooltip {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: var(--shadow-lg);
+  font-size: 0.8rem;
+}
+
+.tooltipLabel {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.tooltipValue {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  margin-top: 2px;
+}
