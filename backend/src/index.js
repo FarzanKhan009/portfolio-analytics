@@ -31,8 +31,12 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`===============================================`);
-  console.log(`🚀 ClickHouse Analytics API Running on port ${PORT}`);
-  console.log(`===============================================`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`===============================================`);
+    console.log(`🚀 ClickHouse Analytics API Running on port ${PORT}`);
+    console.log(`===============================================`);
+  });
+}
+
+module.exports = app;
