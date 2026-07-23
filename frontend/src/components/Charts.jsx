@@ -2,129 +2,142 @@ import React, { useState } from 'react';
 import {
   AreaChart,
   Area,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
 } from 'recharts';
-import styles from './Charts.module.css';
 
 export default function Charts({ data }) {
-  const [activeChart, setActiveChart] = useState('traffic'); // 'traffic' or 'revenue'
+  const [selectedMetric, setSelectedMetric] = useState('pageviews');
+  const [chartType, setChartType] = useState('area'); // 'area', 'line', 'bar'
 
-  if (!data || data.length === 0) {
-    return <div className="loading-overlay">No timeseries data available</div>;
-  }
+  if (!data || data.length === 0) return null;
 
-  // Format date labels nicely
-  const formatDate = (str) => {
-    const d = new Date(str);
-    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  const metricConfig = {
+    pageviews: { label: 'Page Views', color: '#0ce8d0', format: (v) => v.toLocaleString() },
+    uniqueUsers: { label: 'Unique Visitors', color: '#a78bfa', format: (v) => v.toLocaleString() },
+    revenue: { label: 'Revenue ($)', color: '#f59e0b', format: (v) => `$${v.toFixed(2)}` },
+    purchases: { label: 'Purchases', color: '#10b981', format: (v) => v.toLocaleString() },
   };
 
-  // Custom tooltips for nice styling
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className={styles.tooltip}>
-          <p className={styles.tooltipLabel}>{formatDate(label)}</p>
-          {payload.map((p) => (
-            <p key={p.name} className={styles.tooltipValue} style={{ color: p.color }}>
-              {p.name}: {p.name === 'Revenue' ? `$${p.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : p.value.toLocaleString()}
-            </p>
-          ))}
-        </div>
-      );
+  const active = metricConfig[selectedMetric];
+
+  const renderChart = () => {
+    switch (chartType) {
+      case 'line':
+        return (
+          <LineChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <XAxis dataKey="timestamp" stroke="var(--text-muted)" fontSize={11} />
+            <YAxis stroke="var(--text-muted)" fontSize={11} tickFormatter={active.format} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#111620',
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+              }}
+              formatter={(v) => [active.format(v), active.label]}
+            />
+            <Line type="monotone" dataKey={selectedMetric} stroke={active.color} strokeWidth={3} dot={false} />
+          </LineChart>
+        );
+      case 'bar':
+        return (
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <XAxis dataKey="timestamp" stroke="var(--text-muted)" fontSize={11} />
+            <YAxis stroke="var(--text-muted)" fontSize={11} tickFormatter={active.format} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#111620',
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+              }}
+              formatter={(v) => [active.format(v), active.label]}
+            />
+            <Bar dataKey={selectedMetric} fill={active.color} radius={[4, 4, 0, 0]} />
+          </BarChart>
+        );
+      default: // 'area'
+        return (
+          <AreaChart data={data}>
+            <defs>
+              <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={active.color} stopOpacity={0.4} />
+                <stop offset="95%" stopColor={active.color} stopOpacity={0.0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+            <XAxis dataKey="timestamp" stroke="var(--text-muted)" fontSize={11} />
+            <YAxis stroke="var(--text-muted)" fontSize={11} tickFormatter={active.format} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#111620',
+                borderColor: 'rgba(255,255,255,0.12)',
+                borderRadius: '8px',
+                color: '#fff',
+                fontSize: '0.8rem',
+              }}
+              formatter={(v) => [active.format(v), active.label]}
+            />
+            <Area type="monotone" dataKey={selectedMetric} stroke={active.color} strokeWidth={2.5} fillOpacity={1} fill="url(#chartGradient)" />
+          </AreaChart>
+        );
     }
-    return null;
   };
 
   return (
-    <div className="widget">
-      <div className="widget-title">
-        <span>Analytics Over Time</span>
-        <div className={styles.tabs}>
-          <button
-            className={`${styles.tabBtn} ${activeChart === 'traffic' ? styles.active : ''}`}
-            onClick={() => setActiveChart('traffic')}
-          >
-            Traffic
-          </button>
-          <button
-            className={`${styles.tabBtn} ${activeChart === 'revenue' ? styles.active : ''}`}
-            onClick={() => setActiveChart('revenue')}
-          >
-            Revenue
-          </button>
+    <div className="widget-card">
+      <div className="widget-header" style={{ flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <h3 className="widget-title">📈 Analytics Timeseries</h3>
+          <p className="widget-sub">Daily trend metrics breakdown</p>
+        </div>
+
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {/* Metric Selector */}
+          <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-surface)', padding: '3px', borderRadius: '6px' }}>
+            {Object.keys(metricConfig).map((key) => (
+              <button
+                key={key}
+                onClick={() => setSelectedMetric(key)}
+                className={`time-btn ${selectedMetric === key ? 'active' : ''}`}
+                style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+              >
+                {metricConfig[key].label}
+              </button>
+            ))}
+          </div>
+
+          {/* Chart Type Selector */}
+          <div style={{ display: 'flex', gap: '4px', background: 'var(--bg-surface)', padding: '3px', borderRadius: '6px' }}>
+            {['area', 'line', 'bar'].map((type) => (
+              <button
+                key={type}
+                onClick={() => setChartType(type)}
+                className={`time-btn ${chartType === type ? 'active' : ''}`}
+                style={{ padding: '4px 8px', fontSize: '0.75rem', textTransform: 'capitalize' }}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className={styles.chartContainer}>
-        <ResponsiveContainer width="100%" height={320}>
-          {activeChart === 'traffic' ? (
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorPageviews" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--accent-2)" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="var(--accent-2)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-              <XAxis
-                dataKey="timestamp"
-                tickFormatter={formatDate}
-                stroke="var(--text-muted)"
-                fontSize={10}
-                tickLine={false}
-              />
-              <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Area
-                name="Pageviews"
-                type="monotone"
-                dataKey="pageviews"
-                stroke="var(--accent)"
-                strokeWidth={2}
-                fillOpacity={1}
-                fill="url(#colorPageviews)"
-              />
-              <Area
-                name="Visitors"
-                type="monotone"
-                dataKey="uniqueUsers"
-                stroke="var(--accent-2)"
-                strokeWidth={2}
-                fillOpacity={1}
-                fill="url(#colorVisitors)"
-              />
-            </AreaChart>
-          ) : (
-            <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-              <XAxis
-                dataKey="timestamp"
-                tickFormatter={formatDate}
-                stroke="var(--text-muted)"
-                fontSize={10}
-                tickLine={false}
-              />
-              <YAxis stroke="var(--text-muted)" fontSize={10} tickLine={false} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar
-                name="Revenue"
-                dataKey="revenue"
-                fill="var(--accent)"
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          )}
+      <div style={{ width: '100%', height: 320 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          {renderChart()}
         </ResponsiveContainer>
       </div>
     </div>

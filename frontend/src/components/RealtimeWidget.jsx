@@ -1,66 +1,94 @@
 import React from 'react';
-import styles from './RealtimeWidget.module.css';
 
 export default function RealtimeWidget({ activeUsers, recentEvents }) {
-  // Format event timestamps
-  const formatTime = (str) => {
-    const d = new Date(str);
-    return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  };
-
-  const getEventBadgeClass = (type) => {
-    switch (type) {
-      case 'purchase': return `${styles.badge} ${styles.badgePurchase}`;
-      case 'signup': return `${styles.badge} ${styles.badgeSignup}`;
-      case 'click': return `${styles.badge} ${styles.badgeClick}`;
-      default: return `${styles.badge} ${styles.badgeView}`;
-    }
-  };
-
   return (
-    <div className="widget">
-      <div className="widget-title">
-        <span>Real-Time Telemetry</span>
-        <div className={styles.pulseContainer}>
-          <span className={styles.pulseDot} />
-          <span className={styles.pulseText}>LIVE</span>
+    <div className="widget-card">
+      <div className="widget-header">
+        <div>
+          <h3 className="widget-title">
+            <span className="pulse-dot" /> Realtime Telemetry
+          </h3>
+          <p className="widget-sub">Live visitors in 5 min window</p>
         </div>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '1.5rem',
+            fontWeight: 800,
+            color: 'var(--positive)',
+          }}
+        >
+          {activeUsers || 0}
+        </span>
       </div>
 
-      {/* Active users display */}
-      <div className={styles.activeUsersSection}>
-        <div className={styles.activeUsersNumber}>
-          {activeUsers !== undefined ? activeUsers.toLocaleString() : '0'}
-        </div>
-        <div className={styles.activeUsersLabel}>Active visitors (last 5 min)</div>
-      </div>
+      <div style={{ marginTop: '14px' }}>
+        <h4 style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>
+          Live Event Stream (Last 10)
+        </h4>
 
-      {/* Real-time event ticker */}
-      <div className={styles.tickerSection}>
-        <h4 className={styles.tickerTitle}>Incoming Activity Log</h4>
-        
-        {(!recentEvents || recentEvents.length === 0) ? (
-          <div className={styles.emptyLog}>Waiting for telemetry stream...</div>
-        ) : (
-          <div className={styles.logList}>
-            {recentEvents.map((event, idx) => (
-              <div key={idx} className={styles.logItem}>
-                <div className={styles.logTop}>
-                  <span className={getEventBadgeClass(event.eventType)}>
-                    {event.eventType}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '280px', overflowY: 'auto' }}>
+          {recentEvents && recentEvents.length > 0 ? (
+            recentEvents.map((evt, idx) => {
+              const timeStr = evt.timestamp
+                ? new Date(evt.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                : 'Just now';
+
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyConstraint: 'space-between',
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    background: 'var(--bg-surface)',
+                    border: '1px solid var(--border-subtle)',
+                    fontSize: '0.78rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '0.65rem',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        background:
+                          evt.eventType === 'purchase'
+                            ? 'var(--positive-dim)'
+                            : evt.eventType === 'click'
+                            ? 'var(--accent-purple-dim)'
+                            : 'var(--accent-dim)',
+                        color:
+                          evt.eventType === 'purchase'
+                            ? 'var(--positive)'
+                            : evt.eventType === 'click'
+                            ? 'var(--accent-purple)'
+                            : 'var(--accent)',
+                      }}
+                    >
+                      {evt.eventType || 'pageview'}
+                    </span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--text-primary)', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {evt.page || '/'}
+                    </span>
+                  </div>
+
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>
+                    {timeStr}
                   </span>
-                  <span className={styles.time}>{formatTime(event.timestamp)}</span>
                 </div>
-                <div className={styles.logBottom}>
-                  <span className={styles.page}>{event.page}</span>
-                  <span className={styles.meta}>
-                    {event.device} · {event.country}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              );
+            })
+          ) : (
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '16px 0' }}>
+              Waiting for live telemetry events...
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -2,16 +2,14 @@
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: rgba(17, 22, 32, 0.95);
+  background: var(--bg-card);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  box-shadow: var(--shadow-lg);
   z-index: 1000;
   display: flex;
-  backdrop-filter: blur(16px);
   overflow: hidden;
-  animation: slideDown 250ms cubic-bezier(0.16, 1, 0.3, 1);
-  min-width: 520px;
+  animation: slideDown 200ms ease-out;
 }
 
 @keyframes slideDown {
@@ -19,199 +17,206 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Sidebar shortcuts */
+/* Shortcuts sidebar */
 .shortcuts {
-  width: 160px;
-  background: rgba(0, 0, 0, 0.15);
+  width: 180px;
+  background: var(--bg-surface);
   border-right: 1px solid var(--border-subtle);
-  padding: 20px 16px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .shortcutsTitle {
   font-size: 0.65rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
   color: var(--text-muted);
+  letter-spacing: 0.06em;
   margin-bottom: 8px;
+  padding-left: 8px;
 }
 
 .shortcutBtn {
   text-align: left;
-  font-size: 0.8rem;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-secondary);
-  padding: 8px 10px;
-  border-radius: 6px;
   transition: all var(--t-base);
 }
 
 .shortcutBtn:hover {
+  background: var(--bg-elevated);
   color: var(--accent);
-  background: var(--accent-dim);
 }
 
-/* Calendar Container */
-.calendar {
-  flex-grow: 1;
-  padding: 20px 24px;
+/* Main Calendar Section */
+.calendarContainer {
+  padding: 20px;
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 
-.header {
+.rangeHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 12px;
 }
 
-.monthLabel {
+.rangeBadge {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.01em;
+  color: var(--accent);
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-border);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+}
+
+.navControls {
+  display: flex;
+  gap: 8px;
 }
 
 .navBtn {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  padding: 4px 8px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
   transition: all var(--t-base);
 }
 
 .navBtn:hover {
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+  border-color: var(--accent);
 }
 
-/* Weekdays */
+/* Dual Months Layout */
+.dualMonths {
+  display: flex;
+  gap: 24px;
+}
+
+.monthCol {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.monthTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
 .weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  margin-bottom: 8px;
 }
 
 .weekday {
-  font-size: 0.65rem;
-  font-weight: 800;
+  font-size: 0.7rem;
+  font-weight: 700;
   color: var(--text-muted);
-  text-transform: uppercase;
 }
 
-/* Days Grid */
 .daysGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 16px;
+  gap: 2px;
 }
 
 .dayEmpty {
-  height: 32px;
+  height: 28px;
 }
 
 .dayCell {
-  height: 32px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-radius: 4px;
   transition: all 150ms ease;
-  position: relative;
 }
 
-.dayCell:hover:not(.selected) {
-  background: var(--bg-surface);
+.dayCell:hover:not(.disabled) {
+  background: var(--bg-elevated);
   color: var(--accent);
-  cursor: pointer;
 }
 
-/* Selected Date states */
-.selected {
+.dayCell.disabled {
+  color: rgba(255, 255, 255, 0.15);
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.dayCell.selected {
   background: var(--accent) !important;
-  color: var(--bg-base) !important;
-  font-weight: 700;
-  box-shadow: 0 0 12px var(--accent-border);
+  color: #051419 !important;
+  font-weight: 800;
+  box-shadow: 0 0 10px rgba(12, 232, 208, 0.4);
 }
 
-/* Range Highlighting Bridge */
-.inRange {
-  background: rgba(12, 232, 208, 0.08);
+.dayCell.inRange {
+  background: var(--accent-dim);
   color: var(--accent);
   border-radius: 0;
 }
 
-.today::after {
-  content: '';
-  position: absolute;
-  bottom: 3px;
-  width: 4px;
-  height: 4px;
-  background: var(--accent-2);
-  border-radius: 50%;
+.dayCell.today:not(.selected) {
+  border: 1px solid var(--accent);
 }
 
-/* Footer Actions */
+/* Footer */
 .footer {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 10px;
   border-top: 1px solid var(--border-subtle);
-  padding-top: 16px;
-  margin-top: auto;
+  padding-top: 12px;
 }
 
 .cancelBtn {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 6px;
-  transition: all var(--t-base);
-}
-
-.cancelBtn:hover {
+  font-size: 0.78rem;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
+.cancelBtn:hover {
+  color: var(--text-primary);
+}
+
 .applyBtn {
-  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.78rem;
   font-weight: 700;
   background: var(--accent);
-  color: var(--bg-base);
-  padding: 6px 16px;
-  border-radius: 6px;
+  color: #051419;
   transition: all var(--t-base);
-  box-shadow: 0 4px 12px var(--accent-dim);
 }
 
 .applyBtn:hover {
-  box-shadow: 0 4px 20px var(--accent-border);
-}
-
-@media (max-width: 576px) {
-  .popover {
-    flex-direction: column;
-    min-width: 100%;
-    right: auto;
-    left: 0;
-  }
-  .shortcuts {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    border-right: none;
-    border-bottom: 1px solid var(--border-subtle);
-  }
+  box-shadow: var(--shadow-glow);
 }
